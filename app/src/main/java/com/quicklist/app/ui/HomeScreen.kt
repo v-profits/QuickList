@@ -154,6 +154,7 @@ fun HomeScreen(
 
     if (showNew) {
         NewListDialog(
+            muteBeep = { vm.muteVoiceBeep },
             onCreate = { name, type ->
                 showNew = false
                 vm.createList(name, type) { id -> onOpenList(id, true) }
