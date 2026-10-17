@@ -169,6 +169,7 @@ fun HomeScreen(
             label = stringResource(R.string.list_name),
             initial = l.name,
             confirmText = stringResource(R.string.save),
+            muteBeep = { vm.muteVoiceBeep },
             onConfirm = { vm.renameList(l.id, it); renaming = null },
             onDismiss = { renaming = null }
         )
@@ -207,7 +208,12 @@ private fun ListCard(
             }
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
-                Text(list.name, style = MaterialTheme.typography.titleMedium, maxLines = 1)
+                Text(
+                    list.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 2,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
                 val status = when {
                     summary.total == 0 -> stringResource(R.string.list_empty)
                     summary.done == summary.total -> stringResource(R.string.list_all_done)

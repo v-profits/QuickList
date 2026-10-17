@@ -57,7 +57,8 @@ fun TextInputDialog(
     initial: String,
     confirmText: String,
     onConfirm: (String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    muteBeep: (() -> Boolean)? = null
 ) {
     var text by remember { mutableStateOf(initial) }
     val focus = remember { FocusRequester() }
@@ -65,16 +66,25 @@ fun TextInputDialog(
         delay(150)
         runCatching { focus.requestFocus() }
     }
+    val mic: (@Composable () -> Unit)? = if (muteBeep != null) {
+        {
+            MicButton(muteBeep = muteBeep, onText = { spoken ->
+                text = spoken.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+            })
+        }
+    } else null
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
             OutlinedTextField(
                 value = text,
-                onValueChange = { text = it },
+                onValueChange = { text = it.replace("\n", " ") },
                 label = { Text(label) },
-                singleLine = true,
+                singleLine = false,
+                maxLines = 2,
                 modifier = Modifier.focusRequester(focus),
+                trailingIcon = mic,
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { if (text.isNotBlank()) onConfirm(text) })
             )
@@ -178,9 +188,10 @@ fun NewListDialog(
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 OutlinedTextField(
                     value = field,
-                    onValueChange = { field = it },
+                    onValueChange = { field = it.copy(text = it.text.replace("\n", " ")) },
                     label = { Text(stringResource(R.string.list_name)) },
-                    singleLine = true,
+                    singleLine = false,
+                    maxLines = 2,
                     modifier = Modifier.focusRequester(focus),
                     trailingIcon = {
                         MicButton(muteBeep = muteBeep, onText = { spoken ->

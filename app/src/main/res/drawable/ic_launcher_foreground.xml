@@ -1,13 +1,33 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- paper with soft gradient -->
+    <path android:pathData="M38.05,33.2H69.9A4.15,4.15 0 0 1 74.05,37.36V74.74A4.15,4.15 0 0 1 69.9,78.9H38.05A4.15,4.15 0 0 1 33.9,74.74V37.36A4.15,4.15 0 0 1 38.05,33.2Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="74.05"
+                android:endY="33.2"
+                android:startX="33.9"
+                android:startY="78.9"
+                android:type="linear">
+                <item
+                    android:color="#2C2C2C"
+                    android:offset="0" />
+                <item
+                    android:color="#6E6E6E"
+                    android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- outline, spiral tabs, text lines -->
     <path
         android:fillColor="#00000000"
-        android:pathData="M32,56 L47,71 L77,39"
+        android:pathData="M33.9,42.78V37.36A4.15,4.15 0 0 1 38.05,33.2H69.9A4.15,4.15 0 0 1 74.05,37.36V59.95M74.05,68.82V74.74A4.15,4.15 0 0 1 69.9,78.9H38.05A4.15,4.15 0 0 1 33.9,74.74V50.15M44.31,29.05V37.36M54,29.05V37.36M63.69,29.05V37.36M43.59,47.05H64.36M43.59,58.13H53.28M43.59,69.2H58.82"
         android:strokeColor="#FFFFFF"
-        android:strokeWidth="9"
+        android:strokeWidth="4.15"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
 </vector>

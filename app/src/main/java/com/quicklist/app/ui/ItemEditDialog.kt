@@ -57,6 +57,7 @@ import java.util.Calendar
 fun ItemEditDialog(
     item: ItemEntity,
     isShopping: Boolean,
+    muteBeep: () -> Boolean,
     onDismiss: () -> Unit,
     onSave: (ItemEntity) -> Unit,
     onDelete: () -> Unit
@@ -124,6 +125,11 @@ fun ItemEditDialog(
                 OutlinedTextField(
                     value = title, onValueChange = { title = it },
                     label = { Text(stringResource(R.string.field_title)) },
+                    trailingIcon = {
+                        MicButton(muteBeep = muteBeep, onText = { spoken ->
+                            title = spoken.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                        })
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
                 )

@@ -243,7 +243,7 @@ fun ListScreen(vm: AppViewModel, listId: Long, focusInput: Boolean, onBack: () -
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(list?.name.orEmpty(), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                title = { Text(list?.name.orEmpty(), maxLines = 2, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
@@ -438,6 +438,7 @@ fun ListScreen(vm: AppViewModel, listId: Long, focusInput: Boolean, onBack: () -
         ItemEditDialog(
             item = item,
             isShopping = isShopping,
+            muteBeep = { vm.muteVoiceBeep },
             onDismiss = { editing = null },
             onSave = { vm.updateItem(it); editing = null },
             onDelete = { editing = null; deleteItem(item) }
@@ -451,6 +452,7 @@ fun ListScreen(vm: AppViewModel, listId: Long, focusInput: Boolean, onBack: () -
                 label = stringResource(R.string.list_name),
                 initial = list.name,
                 confirmText = stringResource(R.string.save),
+                muteBeep = { vm.muteVoiceBeep },
                 onConfirm = { vm.renameList(listId, it); dialog = null },
                 onDismiss = { dialog = null }
             )
@@ -555,6 +557,8 @@ private fun ItemRow(item: ItemEntity, currency: NumberFormat, onToggle: () -> Un
                     item.title,
                     style = MaterialTheme.typography.bodyLarge,
                     textDecoration = if (item.done) TextDecoration.LineThrough else null,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                     color = if (item.done) subtle else MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f, fill = false)
                 )
