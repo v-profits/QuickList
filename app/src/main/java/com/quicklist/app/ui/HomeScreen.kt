@@ -105,6 +105,7 @@ fun HomeScreen(
             val ls = lists
             if (!ls.isNullOrEmpty()) {
                 QuickAddBar(
+                    muteBeep = { vm.muteVoiceBeep },
                     lists = ls,
                     selectedId = vm.lastListId,
                     onSelect = { vm.setLast(it) },
@@ -244,7 +245,8 @@ private fun QuickAddBar(
     lists: List<ListSummary>,
     selectedId: Long,
     onSelect: (Long) -> Unit,
-    onAdd: (Long, String) -> Unit
+    onAdd: (Long, String) -> Unit,
+    muteBeep: () -> Boolean
 ) {
     var text by rememberSaveable { mutableStateOf("") }
     var menu by remember { mutableStateOf(false) }
@@ -291,6 +293,7 @@ private fun QuickAddBar(
                     onValueChange = { text = it },
                     modifier = Modifier.weight(1f),
                     placeholder = { Text(stringResource(R.string.quick_add_hint)) },
+                    trailingIcon = { MicButton(muteBeep = muteBeep, onText = { spoken -> text = spoken }) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Send),
                     keyboardActions = KeyboardActions(onSend = { submit() })
