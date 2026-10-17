@@ -185,19 +185,13 @@ fun ListScreen(vm: AppViewModel, listId: Long, focusInput: Boolean, onBack: () -
     val voiceError = stringResource(R.string.voice_error)
     val voicePermission = stringResource(R.string.voice_permission)
     var listening by remember { mutableStateOf(false) }
-    var voiceBase by remember { mutableStateOf("") }
-
-    fun joinInput(base: String, spoken: String): String {
-        val b = base.trim().trimEnd(',').trim()
-        return if (b.isEmpty()) spoken else "$b, $spoken"
-    }
 
     val voice = remember {
         VoiceInput(
             context = context,
             shouldMute = { vm.muteVoiceBeep },
             onListening = { listening = it },
-            onText = { text, _ -> input = joinInput(voiceBase, text) },
+            onText = { text, _ -> input = text },
             onError = { code ->
                 if (code != SpeechRecognizer.ERROR_NO_MATCH && code != SpeechRecognizer.ERROR_SPEECH_TIMEOUT) {
                     scope.launch { snackbar.showSnackbar(voiceError) }
@@ -212,7 +206,6 @@ fun ListScreen(vm: AppViewModel, listId: Long, focusInput: Boolean, onBack: () -
             scope.launch { snackbar.showSnackbar(voiceUnavailable) }
             return
         }
-        voiceBase = input
         voice.start()
     }
 
