@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="add_shopping"
+        android:enabled="true"
+        android:icon="@drawable/ic_add"
+        android:shortcutShortLabel="@string/shortcut_shopping"
+        android:shortcutLongLabel="@string/shortcut_shopping">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="quicklist://new/0"
+            android:targetClass="com.quicklist.app.MainActivity"
+            android:targetPackage="com.quicklist.app" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="add_todo"
+        android:enabled="true"
+        android:icon="@drawable/ic_add"
+        android:shortcutShortLabel="@string/shortcut_todo"
+        android:shortcutLongLabel="@string/shortcut_todo">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="quicklist://new/1"
+            android:targetClass="com.quicklist.app.MainActivity"
+            android:targetPackage="com.quicklist.app" />
+    </shortcut>
+</shortcuts>
