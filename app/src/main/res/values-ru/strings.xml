@@ -130,4 +130,6 @@
     <string name="paste_title">Вставка списка</string>
     <string name="paste_hint">Вставьте или введите список, каждая запись с новой строки</string>
     <string name="paste_count">Найдено записей: %1$d</string>
+    <string name="edit_list">Изменить список</string>
+    <string name="list_icon">Значок</string>
 </resources>

@@ -39,6 +39,7 @@ import com.quicklist.app.data.ListEntity
 import com.quicklist.app.data.Prefs
 import com.quicklist.app.data.Repository
 import com.quicklist.app.data.TYPE_SHOPPING
+import com.quicklist.app.ui.listIconFor
 import com.quicklist.app.ui.theme.QuickListTheme
 import kotlinx.coroutines.launch
 
@@ -86,7 +87,7 @@ class WidgetConfigActivity : AppCompatActivity() {
                                         horizontalArrangement = Arrangement.Start
                                     ) {
                                         Icon(
-                                            if (l.type == TYPE_SHOPPING) Icons.Default.ShoppingCart else Icons.Default.CheckCircle,
+                                            listIconFor(l),
                                             contentDescription = null,
                                             tint = MaterialTheme.colorScheme.primary
                                         )

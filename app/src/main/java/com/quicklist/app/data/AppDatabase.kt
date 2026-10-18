@@ -8,6 +8,8 @@ import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.Update
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -79,7 +81,13 @@ interface ItemDao {
     suspend fun idsWithDue(listId: Long): List<Long>
 }
 
-@Database(entities = [ListEntity::class, ItemEntity::class], version = 1, exportSchema = false)
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE lists ADD COLUMN icon INTEGER NOT NULL DEFAULT -1")
+    }
+}
+
+@Database(entities = [ListEntity::class, ItemEntity::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun lists(): ListDao
     abstract fun items(): ItemDao
@@ -90,7 +98,7 @@ abstract class AppDatabase : RoomDatabase() {
         fun get(context: Context): AppDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(
                 context.applicationContext, AppDatabase::class.java, "quicklist.db"
-            ).build().also { instance = it }
+            ).addMigrations(MIGRATION_1_2).build().also { instance = it }
         }
     }
 }

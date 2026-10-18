@@ -76,8 +76,8 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { repo.ensureDefaults() }
     }
 
-    fun createList(name: String, type: Int, onCreated: (Long) -> Unit) {
-        viewModelScope.launch { onCreated(repo.createList(name, type)) }
+    fun createList(name: String, type: Int, icon: Int, onCreated: (Long) -> Unit) {
+        viewModelScope.launch { onCreated(repo.createList(name, type, icon)) }
     }
 
     fun renameList(id: Long, name: String) { viewModelScope.launch { repo.renameList(id, name) } }

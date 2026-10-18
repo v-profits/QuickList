@@ -379,7 +379,7 @@ fun ListScreen(vm: AppViewModel, listId: Long, focusInput: Boolean, onBack: () -
 
                 if (grouped) {
                     for ((cat, catItems) in groups) {
-                        item(key = "h_${cat.name}") {
+                        if (groups.size > 1 || cat != Category.OTHER) item(key = "h_${cat.name}") {
                             Text(
                                 "${cat.emoji}  ${stringResource(cat.label)}",
                                 style = MaterialTheme.typography.labelLarge,
@@ -447,13 +447,15 @@ fun ListScreen(vm: AppViewModel, listId: Long, focusInput: Boolean, onBack: () -
 
     if (list != null) {
         when (dialog) {
-            ListDialog.RENAME -> TextInputDialog(
-                title = stringResource(R.string.rename),
-                label = stringResource(R.string.list_name),
-                initial = list.name,
-                confirmText = stringResource(R.string.save),
+            ListDialog.RENAME -> EditListDialog(
+                initialName = list.name,
+                initialIcon = list.icon,
+                type = list.type,
                 muteBeep = { vm.muteVoiceBeep },
-                onConfirm = { vm.renameList(listId, it); dialog = null },
+                onConfirm = { name, icon ->
+                    vm.updateList(list.copy(name = name.trim(), icon = icon))
+                    dialog = null
+                },
                 onDismiss = { dialog = null }
             )
             ListDialog.DELETE -> ConfirmDialog(

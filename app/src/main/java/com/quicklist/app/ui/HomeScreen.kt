@@ -156,21 +156,23 @@ fun HomeScreen(
     if (showNew) {
         NewListDialog(
             muteBeep = { vm.muteVoiceBeep },
-            onCreate = { name, type ->
+            onCreate = { name, type, icon ->
                 showNew = false
-                vm.createList(name, type) { id -> onOpenList(id, true) }
+                vm.createList(name, type, icon) { id -> onOpenList(id, true) }
             },
             onDismiss = { showNew = false }
         )
     }
     renaming?.let { l ->
-        TextInputDialog(
-            title = stringResource(R.string.rename),
-            label = stringResource(R.string.list_name),
-            initial = l.name,
-            confirmText = stringResource(R.string.save),
+        EditListDialog(
+            initialName = l.name,
+            initialIcon = l.icon,
+            type = l.type,
             muteBeep = { vm.muteVoiceBeep },
-            onConfirm = { vm.renameList(l.id, it); renaming = null },
+            onConfirm = { name, icon ->
+                vm.updateList(l.copy(name = name.trim(), icon = icon))
+                renaming = null
+            },
             onDismiss = { renaming = null }
         )
     }
@@ -201,7 +203,7 @@ private fun ListCard(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    if (list.type == TYPE_SHOPPING) Icons.Default.ShoppingCart else Icons.Default.CheckCircle,
+                    listIconFor(list),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -277,7 +279,7 @@ private fun QuickAddBar(
                     label = { Text(stringResource(R.string.add_to, selected.list.name), maxLines = 1) },
                     leadingIcon = {
                         Icon(
-                            if (selected.list.type == TYPE_SHOPPING) Icons.Default.ShoppingCart else Icons.Default.CheckCircle,
+                            listIconFor(selected.list),
                             contentDescription = null,
                             modifier = Modifier.size(18.dp)
                         )

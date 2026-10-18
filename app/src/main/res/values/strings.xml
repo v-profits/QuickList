@@ -138,4 +138,6 @@
     <string name="paste_title">Paste list</string>
     <string name="paste_hint">Paste or type the list here, one item per line</string>
     <string name="paste_count">Items found: %1$d</string>
+    <string name="edit_list">Edit list</string>
+    <string name="list_icon">Icon</string>
 </resources>

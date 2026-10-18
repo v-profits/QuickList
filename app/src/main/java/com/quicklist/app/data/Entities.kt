@@ -1,5 +1,6 @@
 package com.quicklist.app.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -21,7 +22,9 @@ data class ListEntity(
     val createdAt: Long = System.currentTimeMillis(),
     /** Ordinal of [com.quicklist.app.util.SortMode]. 2 = newest first. */
     val sortMode: Int = 2,
-    val groupByCategory: Boolean = true
+    val groupByCategory: Boolean = true,
+    /** Index in ListIconSet; -1 = choose by list type (lists created before icons existed). */
+    @ColumnInfo(defaultValue = "-1") val icon: Int = -1
 )
 
 @Entity(

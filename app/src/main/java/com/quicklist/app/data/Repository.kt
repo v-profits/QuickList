@@ -45,8 +45,8 @@ class Repository private constructor(private val context: Context) {
     }
 
     // ---- Lists ----
-    suspend fun createList(name: String, type: Int): Long {
-        val id = listDao.insert(ListEntity(name = name.trim(), type = type))
+    suspend fun createList(name: String, type: Int, icon: Int = -1): Long {
+        val id = listDao.insert(ListEntity(name = name.trim(), type = type, icon = icon))
         changed()
         return id
     }
@@ -206,7 +206,7 @@ class Repository private constructor(private val context: Context) {
             lists.put(
                 JSONObject()
                     .put("name", l.name).put("type", l.type)
-                    .put("sortMode", l.sortMode).put("group", l.groupByCategory)
+                    .put("sortMode", l.sortMode).put("group", l.groupByCategory).put("icon", l.icon)
                     .put("items", items)
             )
         }
@@ -223,6 +223,7 @@ class Repository private constructor(private val context: Context) {
                 ListEntity(
                     name = o.optString("name", "List"),
                     type = o.optInt("type", TYPE_SHOPPING),
+                    icon = o.optInt("icon", -1),
                     sortMode = o.optInt("sortMode", 2),
                     groupByCategory = o.optBoolean("group", true)
                 )

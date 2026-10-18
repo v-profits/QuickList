@@ -6,6 +6,16 @@ import android.speech.SpeechRecognizer
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -152,13 +162,44 @@ fun MicButton(muteBeep: () -> Boolean, onText: (String) -> Unit) {
 }
 
 @Composable
+fun ListIconPicker(selected: Int, onSelect: (Int) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        ListIconSet.chunked(6).forEachIndexed { row, icons ->
+            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                icons.forEachIndexed { col, vector ->
+                    val index = row * 6 + col
+                    val isSelected = index == selected
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
+                            .clickable { onSelect(index) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            vector,
+                            contentDescription = null,
+                            tint = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
+                            else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun NewListDialog(
     muteBeep: () -> Boolean,
-    onCreate: (String, Int) -> Unit,
+    onCreate: (String, Int, Int) -> Unit,
     onDismiss: () -> Unit
 ) {
     var field by remember { mutableStateOf(TextFieldValue("")) }
     var type by remember { mutableIntStateOf(TYPE_SHOPPING) }
+    var icon by remember { mutableIntStateOf(ICON_LIST) }
+    var iconTouched by remember { mutableStateOf(false) }
     val shoppingName = stringResource(R.string.default_shopping)
     val todoName = stringResource(R.string.default_todo)
     val name = field.text
@@ -170,9 +211,10 @@ fun NewListDialog(
 
     fun pickType(t: Int) {
         type = t
-        // Suggest a name, but never overwrite something the user typed or dictated.
+        // Suggest a name (and a matching icon) only while the user has not typed or picked their own.
         if (name.isBlank() || name == shoppingName || name == todoName) {
             setName(if (t == TYPE_SHOPPING) shoppingName else todoName)
+            if (!iconTouched) icon = if (t == TYPE_SHOPPING) ICON_CART else ICON_CHECK
         }
     }
 
@@ -185,7 +227,7 @@ fun NewListDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.new_list)) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 OutlinedTextField(
                     value = field,
                     onValueChange = { field = it.copy(text = it.text.replace("\n", " ")) },
@@ -199,7 +241,7 @@ fun NewListDialog(
                         })
                     },
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { if (name.isNotBlank()) onCreate(name, type) })
+                    keyboardActions = KeyboardActions(onDone = { if (name.isNotBlank()) onCreate(name, type, icon) })
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FilterChip(
@@ -225,11 +267,67 @@ fun NewListDialog(
                         }
                     )
                 }
+                Text(stringResource(R.string.list_icon), style = MaterialTheme.typography.labelLarge)
+                ListIconPicker(selected = icon, onSelect = { icon = it; iconTouched = true })
             }
         },
         confirmButton = {
-            TextButton(enabled = name.isNotBlank(), onClick = { onCreate(name, type) }) {
+            TextButton(enabled = name.isNotBlank(), onClick = { onCreate(name, type, icon) }) {
                 Text(stringResource(R.string.create))
+            }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } }
+    )
+}
+
+/** Rename a list and change its icon. */
+@Composable
+fun EditListDialog(
+    initialName: String,
+    initialIcon: Int,
+    type: Int,
+    muteBeep: () -> Boolean,
+    onConfirm: (String, Int) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var field by remember { mutableStateOf(TextFieldValue(initialName, TextRange(initialName.length))) }
+    var icon by remember { mutableIntStateOf(resolveListIconIndex(initialIcon, type)) }
+    val focus = remember { FocusRequester() }
+    val name = field.text
+
+    LaunchedEffect(Unit) {
+        delay(150)
+        runCatching { focus.requestFocus() }
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.edit_list)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                OutlinedTextField(
+                    value = field,
+                    onValueChange = { field = it.copy(text = it.text.replace("\n", " ")) },
+                    label = { Text(stringResource(R.string.list_name)) },
+                    singleLine = false,
+                    maxLines = 2,
+                    modifier = Modifier.focusRequester(focus),
+                    trailingIcon = {
+                        MicButton(muteBeep = muteBeep, onText = { spoken ->
+                            val t = spoken.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                            field = TextFieldValue(t, TextRange(t.length))
+                        })
+                    },
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { if (name.isNotBlank()) onConfirm(name, icon) })
+                )
+                Text(stringResource(R.string.list_icon), style = MaterialTheme.typography.labelLarge)
+                ListIconPicker(selected = icon, onSelect = { icon = it })
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = name.isNotBlank(), onClick = { onConfirm(name, icon) }) {
+                Text(stringResource(R.string.save))
             }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } }

@@ -5,7 +5,7 @@ import com.quicklist.app.R
 
 /** Shopping categories with simple keyword auto-detection (English + Russian). */
 enum class Category(@StringRes val label: Int, val emoji: String, val keywords: List<String>) {
-    OTHER(R.string.cat_other, "🛒", emptyList()),
+    OTHER(R.string.cat_other, "📦", emptyList()),
     PRODUCE(
         R.string.cat_produce, "🥦",
         listOf(
